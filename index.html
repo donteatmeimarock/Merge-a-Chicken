@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Chicken Fusion Simulator - Merge & Idle Tycoon</title>
+  <meta name="description" content="Merge high-tier chickens on a 9x9 farm, trigger super fusions, buy bundles with auto-merging, and build the ultimate poultry empire!" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="gameApp">
+    <!-- Top Header Bar -->
+    <header id="topBar">
+      <div class="logo-badge">
+        <div class="logo-icon">🐔✨</div>
+        <div class="logo-text">
+          <h1>CHICKEN FUSION</h1>
+          <span class="subtitle">9x9 MERGE SIMULATOR</span>
+        </div>
+      </div>
+
+      <!-- Live Resource Counters -->
+      <div class="header-stats">
+        <div class="stat-pill money-pill" id="moneyPill" title="Your current coins">
+          <span class="stat-icon">🪙</span>
+          <div class="stat-meta">
+            <span class="stat-label">MONEY</span>
+            <span class="stat-value" id="moneyDisplay">$0</span>
+          </div>
+        </div>
+
+        <div class="stat-pill income-pill" title="Income generated every second">
+          <span class="stat-icon">⚡</span>
+          <div class="stat-meta">
+            <span class="stat-label">INCOME / SEC</span>
+            <span class="stat-value" id="incomeDisplay">+$0/s</span>
+          </div>
+        </div>
+
+        <div class="stat-pill best-tier-pill" title="Highest discovered chicken tier">
+          <span class="stat-icon">👑</span>
+          <div class="stat-meta">
+            <span class="stat-label">MAX TIER</span>
+            <span class="stat-value" id="maxTierDisplay">Lvl 1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Utility Actions -->
+      <div class="header-actions">
+        <button id="btnSound" class="action-btn icon-only" title="Toggle Sound (M)">🔊</button>
+        <button id="btnSaveCode" class="action-btn" title="Export or Import Save Code">
+          <span>💾</span> <span class="btn-text">Save Code</span>
+        </button>
+        <button id="btnCodex" class="action-btn" title="View Chicken Codex & Tiers (C)">
+          <span>📖</span> <span class="btn-text">Codex</span>
+        </button>
+        <button id="btnStats" class="action-btn" title="Game Statistics">
+          <span>📊</span> <span class="btn-text">Stats</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Area -->
+    <main id="mainContainer">
+      <!-- Left / Top Controls: Shop & Super Actions -->
+      <aside id="shopDock">
+        <div class="dock-section">
+          <div class="section-title">
+            <span>🛒</span> BUY CHICKENS
+          </div>
+          <p class="section-desc">Price scales with purchases. Auto-fuses if plot is full!</p>
+
+          <div class="bundle-grid">
+            <button class="bundle-btn" id="buy1Btn" data-count="1">
+              <div class="bundle-header">
+                <span class="bundle-badge">x1</span>
+                <span class="bundle-name">Single</span>
+              </div>
+              <div class="bundle-preview" id="buy1Preview">🌱</div>
+              <div class="bundle-price" id="price1Display">$10</div>
+            </button>
+
+            <button class="bundle-btn" id="buy5Btn" data-count="5">
+              <div class="bundle-header">
+                <span class="bundle-badge bundle-5">x5</span>
+                <span class="bundle-name">Flock</span>
+              </div>
+              <div class="bundle-preview">🌱🌱</div>
+              <div class="bundle-price" id="price5Display">$55</div>
+            </button>
+
+            <button class="bundle-btn" id="buy10Btn" data-count="10">
+              <div class="bundle-header">
+                <span class="bundle-badge bundle-10">x10</span>
+                <span class="bundle-name">Crate</span>
+              </div>
+              <div class="bundle-preview">📦✨</div>
+              <div class="bundle-price" id="price10Display">$120</div>
+            </button>
+
+            <button class="bundle-btn" id="buy20Btn" data-count="20">
+              <div class="bundle-header">
+                <span class="bundle-badge bundle-20">x20</span>
+                <span class="bundle-name">Truckload</span>
+              </div>
+              <div class="bundle-preview">🚚💨</div>
+              <div class="bundle-price" id="price20Display">$280</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Super Actions & Automation -->
+        <div class="dock-section fuse-actions-section">
+          <div class="section-title">
+            <span>⚡</span> FARM ACTIONS
+          </div>
+          <button id="btnFuseAll" class="super-btn pulse-glow" title="Instantly combine all matching chickens across the entire 9x9 plot!">
+            <span class="super-icon">💥</span>
+            <div class="super-label">
+              <strong>FUSE ALL CHICKENS</strong>
+              <span class="super-sub">Combine all pairs on the board</span>
+            </div>
+          </button>
+
+          <button id="btnSellMode" class="super-btn sell-btn" title="Toggle sell mode: click chickens to select them, then click this button again to sell for 25x income/sec!">
+            <span class="super-icon">🏷️</span>
+            <div class="super-label">
+              <strong id="sellBtnTitle">SELL CHICKENS</strong>
+              <span class="super-sub" id="sellBtnSub">25x Income • Click to start</span>
+            </div>
+          </button>
+          <div id="sellBanner" class="sell-banner hidden">
+            <div class="sell-info">
+              <span id="sellSelectedCount">0 selected</span>
+              <strong id="sellEstimatedValue">+$0</strong>
+            </div>
+            <button id="btnCancelSell" class="cancel-sell-btn" title="Cancel selection">Cancel</button>
+          </div>
+
+          <div class="plot-capacity-bar">
+            <div class="cap-header">
+              <span>Plot Capacity</span>
+              <span id="capacityText">0 / 81 Occupied</span>
+            </div>
+            <div class="cap-track">
+              <div id="capacityFill" class="cap-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passive Tip Box -->
+        <div class="dock-tip">
+          <span class="tip-icon">💡</span>
+          <span class="tip-text"><strong>Pro Tip:</strong> Drag and drop any 2 matching chickens together, or click a chicken to pet it for bonus coins!</span>
+        </div>
+      </aside>
+
+      <!-- Center: 9x9 Farm Plot -->
+      <section id="boardSection">
+        <div class="board-header">
+          <div class="board-title-group">
+            <h2>9x9 FARM PLOT (81 SLOTS)</h2>
+            <span class="board-sub">Drag matching chickens onto each other to fuse!</span>
+          </div>
+          <div class="board-quick-tags">
+            <span class="tag-pill" id="fusableTag">0 Available Fuses</span>
+          </div>
+        </div>
+
+        <!-- The 9x9 Grid (81 cells) -->
+        <div id="gridContainer" class="grid-9x9">
+          <!-- Populated by JavaScript with 81 tile slots -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Floating Canvas for Particle Effects (Feathers, Shocks, Sparks) -->
+    <canvas id="fxCanvas"></canvas>
+
+    <!-- Floating Banner/Toasts Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Modals -->
+    <!-- Chicken Codex / Bestiary Modal -->
+    <div id="codexModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>📖 Chicken Codex & Tiers</h3>
+          <button class="modal-close" id="closeCodexBtn">✕</button>
+        </div>
+        <p class="modal-desc">Discover and fuse all 16 unique chicken tiers. Each tier produces massively higher income!</p>
+        <div id="codexGrid" class="codex-grid">
+          <!-- Generated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div id="statsModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>📊 Farm Statistics</h3>
+          <button class="modal-close" id="closeStatsBtn">✕</button>
+        </div>
+        <div class="stats-list" id="statsList">
+          <!-- Generated dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button id="btnHardReset" class="danger-btn">⚠️ Reset Progress</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save & Load Code Modal -->
+    <div id="saveCodeModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>💾 Save Code Manager</h3>
+          <button class="modal-close" id="closeSaveCodeBtn">✕</button>
+        </div>
+        <p class="modal-desc">Export your poultry empire to a save code or paste a code to restore your farm anytime!</p>
+        
+        <div class="save-code-box">
+          <label for="saveCodeTextarea"><strong>Your Save Code:</strong></label>
+          <textarea id="saveCodeTextarea" rows="4" placeholder="Your save code will appear here or paste a save code..."></textarea>
+          <div class="save-code-actions">
+            <button id="btnGenerateSaveCode" class="action-btn-primary">
+              <span>📋</span> Copy Save Code
+            </button>
+            <button id="btnImportSaveCode" class="action-btn-secondary">
+              <span>📥</span> Load / Restore From Code
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Offline Earnings Dialog -->
+    <div id="offlineModal" class="modal-overlay hidden">
+      <div class="modal-card welcome-back-card">
+        <div class="welcome-icon">🌾🐔💤</div>
+        <h3>Welcome Back, Farmer!</h3>
+        <p>While you were away, your chickens kept laying golden eggs!</p>
+        <div class="offline-earnings-pill">
+          <span class="label">You Earned:</span>
+          <span id="offlineEarnedText" class="val">+$0</span>
+        </div>
+        <button id="btnClaimOffline" class="claim-btn">Collect Earnings! 🪙</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
