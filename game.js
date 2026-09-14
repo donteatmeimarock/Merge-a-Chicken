@@ -1283,7 +1283,7 @@ function updateSellUI() {
     const item = state.cells[idx];
     if (item) {
       const tier = getTier(item.level);
-      totalSellValue += tier.income * 25;
+      totalSellValue += tier.income * 50;
     }
   });
 
@@ -1304,7 +1304,7 @@ function updateSellUI() {
     sellEstimatedValue.textContent = `+$${formatNumber(totalSellValue)}`;
   } else {
     sellBtnTitle.textContent = "SELL CHICKENS";
-    sellBtnSub.textContent = "25x Income • Click to start";
+    sellBtnSub.textContent = "50x Income • Click to start";
   }
 }
 
@@ -1316,7 +1316,7 @@ function executeSellSelected() {
     const item = state.cells[idx];
     if (item) {
       const tier = getTier(item.level);
-      const sellPrice = tier.income * 25;
+      const sellPrice = tier.income * 50;
       totalEarned += sellPrice;
       soldCount++;
 
@@ -1333,7 +1333,7 @@ function executeSellSelected() {
   state.totalMoneyEarned += totalEarned;
 
   sounds.playPurchase();
-  showToast(`Sold ${soldCount} chicken${soldCount === 1 ? "" : "s"} for +$${formatNumber(totalEarned)}! (25x income)`, "💰", "toast-refund");
+  showToast(`Sold ${soldCount} chicken${soldCount === 1 ? "" : "s"} for +$${formatNumber(totalEarned)}! (50x income)`, "💰", "toast-refund");
 
   cancelSellMode();
 }
