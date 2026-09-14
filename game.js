@@ -837,11 +837,11 @@ let fx;
 // ============================================================================
 // CORE ECONOMY CALCULATIONS
 // ============================================================================
-// Single chicken price escalates with purchases (50% cheaper discount applied)
+// Single chicken price escalates with purchases (discounted by an additional 50%)
 function getSingleChickenPrice(purchasedCount = state.chickenPurchasedCount) {
   const fullPrice = state.baseChickenPrice * Math.pow(1.08, purchasedCount);
-  // 50% cheaper discount:
-  return Math.max(1, Math.floor(fullPrice * 0.5));
+  // Lower chicken prices by 50% again:
+  return Math.max(1, Math.floor(fullPrice * 0.25));
 }
 
 // Calculate bundle price accurately across sequential purchases
