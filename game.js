@@ -458,8 +458,8 @@ function getTier(lvl) {
     };
   }
 
-  // Apply 50% bonus to income per second across all chicken tiers
-  const boostedIncome = Math.max(1, Math.round(tierData.income * 1.5));
+  // Apply 5x multiplier to chicken income per second (7.5x base)
+  const boostedIncome = Math.max(1, Math.round(tierData.income * 7.5));
 
   return {
     ...tierData,
