@@ -438,7 +438,7 @@ const CHICKEN_TIERS = [
   }
 ];
 
-// Helper to retrieve tier object safely
+// Helper to retrieve tier object safely with doubled level-to-level progression differences
 function getTier(lvl) {
   let tierData;
   if (lvl <= CHICKEN_TIERS.length) {
@@ -451,19 +451,30 @@ function getTier(lvl) {
     tierData = {
       level: lvl,
       name: `Omega Tier ${lvl} Titan`,
-      income: Math.floor(last.income * Math.pow(3.1, surplus)),
+      income: Math.floor(last.income * Math.pow(4.2, surplus)),
       color: "#ff007f",
       desc: `An unfathomable entity beyond mortal comprehension (Tier ${lvl}).`,
       renderSvg: last.renderSvg
     };
   }
 
-  // Apply 5x multiplier to chicken income per second (7.5x base)
-  const boostedIncome = Math.max(1, Math.round(tierData.income * 7.5));
+  // Base tier 1 income with current 5x economy multiplier
+  const baseT1 = Math.max(1, Math.round(CHICKEN_TIERS[0].income * 7.5)); // 8/s
+  
+  // Calculate scaled income where the delta between consecutive levels is doubled:
+  // Step difference: Δ_k = 2 * (base_k - base_{k-1}) * 7.5
+  let calculatedIncome = baseT1;
+  for (let k = 2; k <= lvl; k++) {
+    const prevBase = k - 1 <= CHICKEN_TIERS.length ? CHICKEN_TIERS[k - 2].income : CHICKEN_TIERS[CHICKEN_TIERS.length - 1].income * Math.pow(3.1, (k - 1) - CHICKEN_TIERS.length);
+    const currBase = k <= CHICKEN_TIERS.length ? CHICKEN_TIERS[k - 1].income : CHICKEN_TIERS[CHICKEN_TIERS.length - 1].income * Math.pow(3.1, k - CHICKEN_TIERS.length);
+    const baseDelta = Math.max(1, (currBase - prevBase) * 7.5);
+    // Double the difference between levels:
+    calculatedIncome += Math.round(baseDelta * 2);
+  }
 
   return {
     ...tierData,
-    income: boostedIncome
+    income: calculatedIncome
   };
 }
 
