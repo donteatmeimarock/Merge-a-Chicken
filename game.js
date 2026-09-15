@@ -474,7 +474,7 @@ function getTier(lvl) {
 
   return {
     ...tierData,
-    income: calculatedIncome
+    income: calculatedIncome * 4
   };
 }
 
